@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Management System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="main.css">
+<script defer src="main.js"></script>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div class="topnav">
+    <div class="logo">Invoice Manager</div>
+    <div class="nav-links">
+        <button onclick="loadPage('dashboard.html', this)" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+        <button onclick="loadPage('import.html', this)"><i class="fas fa-upload"></i> Import Data</button>        
+        <button onclick="loadPage('dataview.html', this)"><i class="fas fa-table"></i> Data View</button>
+        <button onclick="loadPage('analysis.html', this)"><i class="fas fa-chart-bar"></i> Analysis</button>
+        <button onclick="loadPage('invoice_cons.html', this)"><i class="fas fa-file-invoice"></i> Create Invoice</button>
+    </div>
+        <div class="user-info" id="user-info">
+            Welcome, <span id="username">User</span>
+            <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+</div>
+
+<!-- Main Content -->
+<div class="content">
+    <iframe id="content-frame" src="dashboard.html"></iframe>
+</div>
+
+<!-- Scripts -->
+<script>
+// Fetch logged-in user name from backend
+document.addEventListener("DOMContentLoaded", function() {
+    const usernameSpan = document.getElementById("username");
+    const empname = localStorage.getItem("empname");
+    if(empname) {
+        usernameSpan.innerText = empname;
+    }
+});
+
+
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+        const res = await fetch("/api/logout", { method: "POST", credentials: "include" });
+        const data = await res.json();
+        if(data.success) window.location.href = "login.html";
+    } catch(err) {
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>

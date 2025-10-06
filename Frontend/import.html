@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Import Data - Invoice Management</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="import.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-upload"></i> Import Data</h1>
+        <p>Upload Vendor & GIS Reports securely</p>
+    </div>
+
+    <div class="upload-section">
+        <!-- Vendor Upload -->
+        <div class="upload-card">
+            <h2><i class="fas fa-file-alt"></i> Vendor Report</h2>
+            <form id="vendorForm">
+                <input type="file" name="vendor_file" id="vendor_file" accept=".csv,.xlsx,.xls" required>
+                <label for="vendor_file" class="file-input-label">
+                    <i class="fas fa-folder-open"></i> 
+                    <span id="vendorFileName">Choose File</span>
+                </label>
+                <button type="submit"><i class="fas fa-upload"></i> Upload Vendor</button>
+            </form>
+            <div id="vendorMsg" class="message" style="display:none;"></div>
+        </div>
+
+        <!-- GIS Upload -->
+        <div class="upload-card">
+            <h2><i class="fas fa-map-marked-alt"></i> GIS Report</h2>
+            <form id="gisForm">
+                <input type="file" name="gis_file" id="gis_file" accept=".csv,.xlsx,.xls" required>
+                <label for="gis_file" class="file-input-label">
+                    <i class="fas fa-folder-open"></i> 
+                    <span id="gisFileName">Choose File</span>
+                </label>
+                <button type="submit"><i class="fas fa-upload"></i> Upload GIS</button>
+            </form>
+            <div id="gisMsg" class="message" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <strong>Upload Guidelines:</strong>
+        <ul>
+            <li>Formats: CSV, XLSX, XLS</li>
+            <li>Max File Size: 10MB</li>
+            <li>Ensure proper headers match database columns</li>
+            <li>Vendor files: SAP_ID, GIS_ID, invoice details</li>
+            <li>GIS files: Employee & travel info</li>
+            <li>Files processed automatically</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Show selected filename
+document.getElementById('vendor_file').addEventListener('change', function() {
+    const fileName = this.files[0]?.name || 'Choose File';
+    document.getElementById('vendorFileName').textContent = fileName;
+    console.log('✅ Vendor file selected:', fileName);
+});
+
+document.getElementById('gis_file').addEventListener('change', function() {
+    const fileName = this.files[0]?.name || 'Choose File';
+    document.getElementById('gisFileName').textContent = fileName;
+    console.log('✅ GIS file selected:', fileName);
+});
+
+// Vendor Upload
+document.getElementById('vendorForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log('🚀 Vendor form submitted');
+    
+    const fileInput = document.getElementById('vendor_file');
+    const msgDiv = document.getElementById('vendorMsg');
+    const submitBtn = this.querySelector('button[type="submit"]');
+
+    if(fileInput.files.length === 0){
+        showMessage(msgDiv, "❌ Please select a file", "error");
+        console.log('❌ No file selected');
+        return;
+    }
+
+    console.log('📁 File to upload:', fileInput.files[0].name, 'Size:', fileInput.files[0].size, 'bytes');
+
+    const formData = new FormData();
+    formData.append('vendor_file', fileInput.files[0]);
+
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    showMessage(msgDiv, "⏳ Uploading file...", "info");
+
+    try {
+        console.log('📤 Sending POST request to /api/upload/vendor');
+        
+        const res = await fetch("/api/upload/vendor", {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        });
+        
+        console.log('📥 Response status:', res.status, res.statusText);
+        console.log('📥 Response headers:', [...res.headers.entries()]);
+        
+        // Check if response is JSON
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const textResponse = await res.text();
+            console.error('❌ Non-JSON response received:', textResponse);
+            showMessage(msgDiv, "❌ Server returned invalid response. Check console.", "error");
+            return;
+        }
+        
+        const data = await res.json();
+        console.log('📊 Response data:', data);
+        
+        if(data.success){
+            showMessage(msgDiv, "✅ " + data.message, "success");
+            fileInput.value = '';
+            document.getElementById('vendorFileName').textContent = 'Choose File';
+            console.log('✅ Upload successful!');
+        } else {
+            showMessage(msgDiv, "❌ " + data.message, "error");
+            console.log('❌ Upload failed:', data.message);
+        }
+    } catch(err) {
+        console.error('❌ Fetch error details:', err);
+        console.error('❌ Error name:', err.name);
+        console.error('❌ Error message:', err.message);
+        console.error('❌ Error stack:', err.stack);
+        showMessage(msgDiv, "❌ Server error: " + err.message, "error");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Vendor';
+    }
+});
+
+// GIS Upload
+document.getElementById('gisForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log('🚀 GIS form submitted');
+    
+    const fileInput = document.getElementById('gis_file');
+    const msgDiv = document.getElementById('gisMsg');
+    const submitBtn = this.querySelector('button[type="submit"]');
+
+    if(fileInput.files.length === 0){
+        showMessage(msgDiv, "❌ Please select a file", "error");
+        console.log('❌ No file selected');
+        return;
+    }
+
+    console.log('📁 File to upload:', fileInput.files[0].name, 'Size:', fileInput.files[0].size, 'bytes');
+
+    const formData = new FormData();
+    formData.append('gis_file', fileInput.files[0]);
+
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    showMessage(msgDiv, "⏳ Uploading file...", "info");
+
+    try {
+        console.log('📤 Sending POST request to /api/upload/gis');
+        
+        const res = await fetch("/api/upload/gis", {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        });
+        
+        console.log('📥 Response status:', res.status, res.statusText);
+        console.log('📥 Response headers:', [...res.headers.entries()]);
+        
+        // Check if response is JSON
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const textResponse = await res.text();
+            console.error('❌ Non-JSON response received:', textResponse);
+            showMessage(msgDiv, "❌ Server returned invalid response. Check console.", "error");
+            return;
+        }
+        
+        const data = await res.json();
+        console.log('📊 Response data:', data);
+        
+        if(data.success){
+            showMessage(msgDiv, "✅ " + data.message, "success");
+            fileInput.value = '';
+            document.getElementById('gisFileName').textContent = 'Choose File';
+            console.log('✅ Upload successful!');
+        } else {
+            showMessage(msgDiv, "❌ " + data.message, "error");
+            console.log('❌ Upload failed:', data.message);
+        }
+    } catch(err) {
+        console.error('❌ Fetch error details:', err);
+        console.error('❌ Error name:', err.name);
+        console.error('❌ Error message:', err.message);
+        console.error('❌ Error stack:', err.stack);
+        showMessage(msgDiv, "❌ Server error: " + err.message, "error");
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload GIS';
+    }
+});
+
+// Helper function to show messages
+function showMessage(element, message, type) {
+    element.textContent = message;
+    element.className = 'message ' + type;
+    element.style.display = 'block';
+    
+    // Auto-hide success messages after 5 seconds
+    if (type === 'success') {
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 5000);
+    }
+}
+</script>
+
+</body>
+</html>

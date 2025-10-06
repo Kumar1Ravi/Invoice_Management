@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Consolidation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="invoice_cons.css">
+</head>
+<body>
+
+    <div class="page-container">
+        
+        <!-- Top Search Bar -->
+        <div class="top-search">
+            <div class="search-inputs">
+                <div class="search-field">
+                    <label>SAP ID</label>
+                    <input type="text" id="search_sap_id" placeholder="Enter SAP ID to search">
+                </div>
+                <div class="search-field">
+                    <label>GIS ID</label>
+                    <select id="search_gis_id" onchange="fetchInvoiceDetails()">
+                        <option value="">-- Select GIS ID --</option>
+                    </select>
+                </div>
+                <button class="btn-search" onclick="fetchGISList()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button class="btn-clear" onclick="clearSearch()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert Message -->
+        <div id="alertMessage" class="alert" style="display:none;"></div>
+
+        <!-- Main Form -->
+        <form id="invoiceForm">
+            <div class="form-layout">
+                
+                <!-- Left Column -->
+                <div class="form-column">
+                    
+                    <!-- Employee Information -->
+                    <fieldset>
+                        <legend>Employee Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>SAP ID</label>
+                                <input type="text" name="SAP_ID">
+                            </div>
+                            <div class="field">
+                                <label>GIS ID</label>
+                                <input type="text" name="GIS_ID">
+                            </div>
+                            <div class="field">
+                                <label>Employee Name</label>
+                                <input type="text" name="Employee_Name">
+                            </div>
+                            <div class="field">
+                                <label>Case Manager Name</label>
+                                <input type="text" name="Case_Manager_Name">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Country Information -->
+                    <fieldset>
+                        <legend>Country Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Source country</label>
+                                <input type="text" name="Source_Country">
+                            </div>
+                            <div class="field">
+                                <label>Destination country</label>
+                                <input type="text" name="Destination_Country">
+                            </div>
+                            <div class="field">
+                                <label>Region</label>
+                                <input type="text" name="Region">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Invoice Information -->
+                    <fieldset>
+                        <legend>Invoice Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Toscana ID/Ariba</label>
+                                <input type="text" name="Toscana_ID_Ariba">
+                            </div>
+                            <div class="field">
+                                <label>Cons-Invoice Number</label>
+                                <input type="text" name="Invoice_Number">
+                            </div>
+                            <div class="field">
+                                <label>Indiv-I Invoice Number</label>
+                                <input type="text" name="Individual_Invoice_Number">
+                            </div>
+                            <div class="field">
+                                <label>Invoice Date</label>
+                                <input type="date" name="Invoice_Date">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Invo-recd date at HCL</label>
+                                <input type="date" name="Invoice_Received_Date_at_HCL">
+                            </div>
+                            <div class="field">
+                                <label>Invoice Due date</label>
+                                <input type="date" name="Invoice_Due_Date">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Service and Vendor Information -->
+                    <fieldset>
+                        <legend>Approval and Processing Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Service Description</label>
+                                <input type="text" name="Service_Description">
+                            </div>
+                            <div class="field">
+                                <label>Category</label>
+                                <input type="text" name="Category">
+                            </div>
+                            <div class="field">
+                                <label>Service rendered month</label>
+                                <input type="text" name="Service_Rendered_Month">
+                            </div>
+                            <div class="field">
+                                <label>Vendor code</label>
+                                <input type="text" name="Vendor_Code">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field span-2">
+                                <label>Vendor Name</label>
+                                <input type="text" name="Vendor_Name">
+                            </div>
+                            <div class="field">
+                                <label>Company code</label>
+                                <input type="text" name="Company_Code">
+                            </div>
+                        </div>
+                        <div class="field-row amounts">
+                            <div class="field">
+                                <label>SPF</label>
+                                <input type="text" step="0.01" name="Service_Provider_Fee" class="amount-field";>
+                            </div>
+                            <div class="field">
+                                <label>SPFT</label>
+                                <input type="text" step="0.01" name="Service_Provider_Fee_Tax" class="amount-field">
+                            </div>
+                            <div class="field">
+                                <label>SPFT+SPFT</label>
+                                <input type="text" step="0.01" name="Service_Tax_Total" class="amount-field">
+                            </div>
+                            <div class="field">
+                                <label>GOV</label>
+                                <input type="text" step="0.01" name="Govt_Fee" class="amount-field">
+                            </div>
+                        </div>
+                        <div class="field-row amounts">
+                            <div class="field">
+                                <label>VFS-F</label>
+                                <input type="text" step="0.01" name="VFS_Fee" class="amount-field">
+                            </div>
+                            <div class="field">
+                                <label>Misc</label>
+                                <input type="text" step="0.01" name="Misc_Other_Exp" class="amount-field">
+                            </div>
+                            <div class="field">
+                                <label>Tax</label>
+                                <input type="text" step="0.01" name="Tax" class="amount-field">
+                            </div>
+                            <div class="field">
+                                <label>TIA</label>
+                                <input type="text" step="0.01" name="Total_Invoice_Amount" readonly>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- NEW GIS -->
+                    <fieldset>
+                        <legend>NEW GIS</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Destination Country</label>
+                                <input type="text" name="NEW_GIS_Destination_Country">
+                            </div>
+                            <div class="field">
+                                <label>Visa Sub Type</label>
+                                <input type="text" name="NEW_GIS_Visa_Sub_Type">
+                            </div>
+                            <div class="field">
+                                <label>Dependent Name</label>
+                                <input type="text" name="NEW_GIS_Dependent_Name">
+                            </div>
+                            <div class="field">
+                                <label>Current Status</label>
+                                <input type="text" name="NEW_GIS_Current_Status">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Project Name</label>
+                                <input type="text" name="NEW_GIS_Project_Name">
+                            </div>
+                            <div class="field">
+                                <label>Billable cost center</label>
+                                <input type="text" name="NEW_GIS_Billable_cosst_center">
+                            </div>
+                            <div class="field">
+                                <label>Employee Cost Cener</label>
+                                <input type="text" name="NEW_GIS_Employee_current_status">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                </div>
+
+                <!-- Right Column -->
+                <div class="form-column">
+                    
+                    <!-- Visa Details -->
+                    <fieldset>
+                        <legend>Visa Details</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Type of Request</label>
+                                <input type="text" name="Type_of_Request">
+                            </div>
+                            <div class="field">
+                                <label>Visa Type</label>
+                                <input type="text" name="Visa_Type">
+                            </div>
+                            <div class="field">
+                                <label>Visa Sub type</label>
+                                <input type="text" name="Visa_Sub_Type">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Approval and Processing Information -->
+                    <fieldset>
+                        <legend>Approval and Processing Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>GEO leads Approver name</label>
+                                <input type="text" name="GEO_Leads_Approver_Name">
+                            </div>
+                            <div class="field">
+                                <label>Date sent to GEO Lead</label>
+                                <input type="date" name="Date_Sent_to_GEO_Lead">
+                            </div>
+                            <div class="field">
+                                <label>Date approved by GEO Lead</label>
+                                <input type="date" name="Date_Approved_by_GEO_Lead">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Date sent to Mail Room</label>
+                                <input type="date" name="Date_Sent_to_Mail_Room">
+                            </div>
+                            <div class="field">
+                                <label>Neon Introduction date</label>
+                                <input type="date" name="Neon_Introduction_Date">
+                            </div>
+                            <div class="field">
+                                <label>Date sent to Approver in Neon</label>
+                                <input type="date" name="Date_Sent_to_Approver_in_Neon">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Date appro by L1-L4 in neon</label>
+                                <input type="date" name="Date_Approved_by_L1_L4_in_Neon">
+                            </div>
+                            <div class="field">
+                                <label>Finance approved date</label>
+                                <input type="date" name="Finance_Approved_Date">
+                            </div>
+                            <div class="field">
+                                <label>Payment processed date</label>
+                                <input type="date" name="Payment_Processed_Date">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Financial Information -->
+                    <fieldset>
+                        <legend>Financial Information</legend>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Currency</label>
+                                <input type="text" name="Currency">
+                            </div>
+                            <div class="field">
+                                <label>Cost center</label>
+                                <input type="text" name="Cost_Center">
+                            </div>
+                            <div class="field">
+                                <label>Project Code</label>
+                                <input type="text" name="Project_Code">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>GSTN</label>
+                                <input type="text" name="GSTN">
+                            </div>
+                            <div class="field">
+                                <label>Currency Exchange rate</label>
+                                <input type="number" step="0.0001" name="Currency_Exchange_Rate">
+                            </div>
+                            <div class="field">
+                                <label>Document Currency in USD</label>
+                                <input type="number" step="0.01" name="Document_Currency_in_USD">
+                            </div>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>LOB (Line of Business)</label>
+                                <input type="text" name="LOB">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Invoice Status -->
+                    <fieldset>
+                        <legend>Invoice Status</legend>
+                        <div class="field-row">
+                            <div class="field span-2">
+                                <label>Invoice Current Status</label>
+                                <input type="text" name="Invoice_Current_Status">
+                            </div>
+                            <div class="field span-2">
+                                <label>Remarks</label>
+                                <textarea name="Remarks" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                </div>
+
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button type="button" class="btn-edit" onclick="enableEditMode()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button type="button" class="btn-cancel-edit" onclick="cancelEditMode()" style="display: none;">
+                    <i class="fas fa-times"></i> Cancel Edit
+                </button>  
+                <button type="button" class="btn-cancel-edit" onclick="cancelEditMode()">
+                    <i class="fas fa-times"></i> Cancel Edit
+                </button>                                              
+            </div>
+
+        </form>
+
+    </div>
+
+    <script src="invoice_cons.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Data Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="dataview.css">
+</head>
+<body>
+
+
+    <h1><i class="fas fa-table"></i> Invoice Dashboard</h1>
+    <p>Overview of vendor invoice records</p>
+
+
+<div class="stats-section">
+    <div class="stat-card">
+        <h3 id="totalRecords">0</h3>
+        <p>Total Records</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="totalAmount">$0</h3>
+        <p>Total Invoice Amount</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="avgInvoiceAmount">$0</h3>
+        <p>Average Invoice</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="uniqueEmployees">0</h3>
+        <p>Unique Employees</p>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2><i class="fas fa-database"></i> Invoice Records</h2>
+    </div>
+
+    <div class="table-controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search records...">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="pagination-controls">
+            <label for="recordsPerPage">Show:</label>
+            <select id="recordsPerPage" onchange="changeRecordsPerPage()">
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="80">80</option>
+                <option value="100">100</option>
+            </select>
+            <span id="pageInfo">records per page</span>
+        </div>
+        <button class="filter-btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        <button class="filter-btn" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading invoice data...</p>
+    </div>
+
+    <table id="dataTable" style="display:none;">
+        <thead>
+            <tr>
+                <th style="width: 50px; text-align: center;">SNo</th>
+                <th style="width: 100px; text-align: center;">SAP ID</th>
+                <th style="width: 100px; text-align: center;">GIS ID</th>
+                <th style="width: 180px; text-align: center;">Employee Name</th>
+                <th style="width: 120px; text-align: center;">Source</th>
+                <th style="width: 120px; text-align: center;">Destination</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">SP Fee</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">SP Tax</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">Gov Fee</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">VFS Fee</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">Misc Exp</th>
+                <th style="width: 90px; text-align: center;" class="amount-column">Tax</th>
+                <th style="width: 120px; text-align: center;" class="amount-column">Total Amount</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data will be populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <div class="pagination" id="pagination" style="display:none;">
+        <button class="pagination-btn" onclick="goToFirstPage()" id="firstBtn">
+            <i class="fas fa-angle-double-left"></i>
+        </button>
+        <button class="pagination-btn" onclick="previousPage()" id="prevBtn">
+            <i class="fas fa-angle-left"></i> Previous
+        </button>
+        <span class="page-numbers" id="pageNumbers"></span>
+        <button class="pagination-btn" onclick="nextPage()" id="nextBtn">
+            Next <i class="fas fa-angle-right"></i>
+        </button>
+        <button class="pagination-btn" onclick="goToLastPage()" id="lastBtn">
+            <i class="fas fa-angle-double-right"></i>
+        </button>
+    </div>
+</div>
+
+<script src="dataview.js"></script>
+</body>
+</html>

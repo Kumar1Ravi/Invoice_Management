@@ -4,12 +4,15 @@ if (process.env.POSTGRES_URL) {
     module.exports = { sql };
 } else {
     // Use local MSSQL
-    const sql = require('mssql');
+const sql = require('mssql');
 
+let poolPromise = null;
+
+if (process.env.DB_USER || process.env.DB_PASSWORD || process.env.DB_SERVER) {
     const config = {
-        user: process.env.DB_USER || 'Kumar_IMS',
-        password: process.env.DB_PASSWORD || 'Kumar@17071992',
-        server: process.env.DB_SERVER || 'KUMARR\\SQLEXPRESS',
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        server: process.env.DB_SERVER,
         database: process.env.DB_NAME || 'Kumar_IMS',
         options: {
             encrypt: process.env.DB_ENCRYPT === 'true' || false,
@@ -17,7 +20,7 @@ if (process.env.POSTGRES_URL) {
         }
     };
 
-    const poolPromise = sql.connect(config)
+    poolPromise = sql.connect(config)
         .then(pool => {
             console.log('✅ Connected to SQL Server');
             return pool;
@@ -25,6 +28,9 @@ if (process.env.POSTGRES_URL) {
         .catch(err => {
             console.error('❌ SQL Server Connection Error: ', err);
         });
+} else {
+    console.log('ℹ️ No DB config, using mock data');
+}
 
-    module.exports = { sql, poolPromise };
+module.exports = { sql, poolPromise };
 }

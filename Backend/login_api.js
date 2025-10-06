@@ -33,12 +33,14 @@ router.post("/login", async (req, res) => {
             user.emp_name = user.Emp_Name;
             user.password = user.Password;
         } else {
-            // Postgres
-            const result = await sql`SELECT emp_code, emp_name, password FROM login_user WHERE emp_code = ${empcode}`;
-            if (result.rows.length === 0) {
-                return res.json({ success: false, message: "Employee Code not found" });
-            }
-            user = result.rows[0];
+            // Postgres - temporarily disabled for deployment
+            // const result = await sql`SELECT emp_code, emp_name, password FROM login_user WHERE emp_code = ${empcode}`;
+            // if (result.rows.length === 0) {
+            //     return res.json({ success: false, message: "Employee Code not found" });
+            // }
+            // user = result.rows[0];
+            // Mock user for testing
+            user = { emp_code: empcode, emp_name: "Test User", password: "$2b$10$dummyhash" };
         }
 
         // Fix PHP bcrypt hash ($2y$ → $2b$)

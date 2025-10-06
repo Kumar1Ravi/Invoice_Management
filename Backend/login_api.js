@@ -39,18 +39,23 @@ router.post("/login", async (req, res) => {
             //     return res.json({ success: false, message: "Employee Code not found" });
             // }
             // user = result.rows[0];
-            // Mock user for testing
-            user = { emp_code: empcode, emp_name: "Test User", password: "$2b$10$dummyhash" };
+            // Mock user for testing - accept any password
+            user = { emp_code: empcode, emp_name: "Test User" };
+            // Skip password check for mock
+            // const match = true;
         }
 
         // Fix PHP bcrypt hash ($2y$ → $2b$)
         let hash = user.password;
-        if (hash.startsWith("$2y$")) {
+        if (hash && hash.startsWith("$2y$")) {
             hash = "$2b$" + hash.slice(4);
         }
 
         // Compare password
-        const match = await bcrypt.compare(password, hash);
+        let match = true; // Default for mock
+        if (hash) {
+            match = await bcrypt.compare(password, hash);
+        }
         if (!match) {
             return res.json({ success: false, message: "Invalid password" });
         }

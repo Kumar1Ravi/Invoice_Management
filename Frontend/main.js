@@ -1,6 +1,8 @@
 // frontend/main.js
 
-document.getElementById("login-form").addEventListener("submit", async function(e) {
+const loginForm = document.getElementById("login-form");
+if (loginForm) {
+    loginForm.addEventListener("submit", async function(e) {
     e.preventDefault(); // Prevent form submission
 
     const empcode = document.getElementById("empcode").value.trim();
@@ -41,7 +43,8 @@ document.getElementById("login-form").addEventListener("submit", async function(
         messageDiv.style.color = "red";
         messageDiv.textContent = "❌ Server error. Please try again later.";
     }
-});
+    });
+}
 
 
 function loadPage(pageUrl, btn) {
@@ -55,15 +58,18 @@ function loadPage(pageUrl, btn) {
     if(btn) btn.classList.add('active');
 }
 
-// Logout logic
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    fetch('/api/logout', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                window.location.href = 'login.html';
-            } else {
-                alert('Logout failed');
-            }
-        });
-});
+// Logout logic - only if element exists
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        fetch('/api/logout', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Logout failed');
+                }
+            });
+    });
+}

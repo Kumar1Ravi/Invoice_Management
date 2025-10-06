@@ -10,10 +10,11 @@ document.getElementById("login-form").addEventListener("submit", async function(
     messageDiv.textContent = "Logging in...";
 
     try {
-        const response = await fetch("http://localhost:3000/api/login", {
+        const response = await fetch("/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ empcode, password })
+            body: JSON.stringify({ empcode, password }),
+            credentials: 'include'
         });
 
         const data = await response.json();

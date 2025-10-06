@@ -1,13 +1,13 @@
 const sql = require('mssql');
 
 const config = {
-    user: 'Kumar_IMS',
-    password: 'Kumar@17071992',
-    server: 'KUMARR\\SQLEXPRESS', // Use double backslash
-    database: 'Kumar_IMS',
+    user: process.env.DB_USER || 'Kumar_IMS',
+    password: process.env.DB_PASSWORD || 'Kumar@17071992',
+    server: process.env.DB_SERVER || 'KUMARR\\SQLEXPRESS',
+    database: process.env.DB_NAME || 'Kumar_IMS',
     options: {
-        encrypt: false, // true if using Azure
-        trustServerCertificate: true // required for local dev
+        encrypt: process.env.DB_ENCRYPT === 'true' || false,
+        trustServerCertificate: process.env.DB_TRUST_CERT === 'true' || true
     }
 };
 

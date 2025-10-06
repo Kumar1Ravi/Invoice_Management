@@ -3,14 +3,19 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 const xlsx = require("xlsx");
 const { parse } = require("csv-parse");
 const sql = require("mssql");
 const { poolPromise } = require("./db");
 
 // Setup multer
-const upload = multer({ 
-    dest: "uploads/",
+const uploadDir = path.join(os.tmpdir(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+const upload = multer({
+    dest: uploadDir,
     limits: { fileSize: 10 * 1024 * 1024 }
 });
 

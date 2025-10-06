@@ -12,10 +12,11 @@ loginForm.addEventListener('submit', async (e) => {
 
   // Make a fetch POST request to backend login API
   try {
-    const response = await fetch('login_api.php', { // backend endpoint
+    const response = await fetch('/api/login', { // backend endpoint
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ empcode, password })
+      body: JSON.stringify({ empcode, password }),
+      credentials: 'include'
     });
 
     const data = await response.json();

@@ -2,8 +2,7 @@
 const express = require("express");
 const router = express.Router();       // ✅ declare router only once
 const bcrypt = require("bcrypt");      // or bcryptjs
-const { poolPromise } = require("./db"); // DB connection
-const sql = require("mssql");
+const { sql } = require("./db"); // DB connection
 
 // ---------------------
 // Login API
@@ -17,20 +16,17 @@ router.post("/login", async (req, res) => {
             return res.json({ success: false, message: "Missing credentials" });
         }
 
-        // Connect to SQL Server
-        const pool = await poolPromise;
-        const result = await pool.request()
-            .input("Emp_Code", sql.VarChar, empcode)
-            .query("SELECT Emp_Code, Emp_Name, Password FROM Login_User WHERE Emp_Code = @Emp_Code");
+        // Query database
+        const result = await sql`SELECT emp_code, emp_name, password FROM login_user WHERE emp_code = ${empcode}`;
 
-        if (result.recordset.length === 0) {
+        if (result.rows.length === 0) {
             return res.json({ success: false, message: "Employee Code not found" });
         }
 
-        const user = result.recordset[0];
+        const user = result.rows[0];
 
         // Fix PHP bcrypt hash ($2y$ → $2b$)
-        let hash = user.Password;
+        let hash = user.password;
         if (hash.startsWith("$2y$")) {
             hash = "$2b$" + hash.slice(4);
         }
@@ -43,10 +39,10 @@ router.post("/login", async (req, res) => {
 
         // Save session (ensure express-session is set up in server.js)
         if (!req.session) req.session = {};
-        req.session.empcode = user.Emp_Code;
-        req.session.empname = user.Emp_Name;
+        req.session.empcode = user.emp_code;
+        req.session.empname = user.emp_name;
 
-        res.json({ success: true, empname: user.Emp_Name });
+        res.json({ success: true, empname: user.emp_name });
 
     } catch (err) {
         console.error("Login API error:", err); // 🔹 detailed error logging

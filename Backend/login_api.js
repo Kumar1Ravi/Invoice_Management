@@ -40,7 +40,7 @@ router.post("/login", async (req, res) => {
             // }
             // user = result.rows[0];
             // Mock user for testing - accept any password
-            user = { emp_code: empcode, emp_name: "Test User" };
+            user = { emp_code: empcode, emp_name: empcode };
             // Skip password check for mock
             // const match = true;
         }

@@ -1,8 +1,8 @@
 // backend/invoice_cons_api.js
 const express = require("express");
 const router = express.Router();
-const { poolPromise } = require("./db");
-const sql = require("mssql");
+const { sql } = require("./db");
+// const sql = require("mssql"); // Temporarily disabled for Postgres migration
 
 // ----------------------
 // GET /api/invoice-cons/gis-list

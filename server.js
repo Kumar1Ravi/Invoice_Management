@@ -5,10 +5,10 @@ const cors = require("cors");
 
 // Routers
 const loginRouter = require("./Backend/login_api");
-const uploadRouter = require("./Backend/upload_api");
-const invoiceRouter = require("./Backend/invoice_api");
-const analysisRouter = require("./Backend/analysis_api");
-const invoiceConsRouter = require("./Backend/invoice_cons_api");
+// const uploadRouter = require("./Backend/upload_api");
+// const invoiceRouter = require("./Backend/invoice_api");
+// const analysisRouter = require("./Backend/analysis_api");
+// const invoiceConsRouter = require("./Backend/invoice_cons_api");
 
 const app = express();
 
@@ -42,10 +42,10 @@ app.get("/", (req, res) => {
 
 // API routes
 app.use("/api", loginRouter);
-app.use("/api", uploadRouter);
-app.use("/api", invoiceRouter);
-app.use("/api", analysisRouter);
-app.use("/api", invoiceConsRouter);
+// app.use("/api", uploadRouter); // Temporarily disabled for Postgres migration
+// app.use("/api", invoiceRouter); // Temporarily disabled for Postgres migration
+// app.use("/api", analysisRouter); // Temporarily disabled for Postgres migration
+// app.use("/api", invoiceConsRouter); // Temporarily disabled for Postgres migration
 
 // Export app for Vercel
 module.exports = app;

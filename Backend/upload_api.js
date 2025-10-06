@@ -6,8 +6,7 @@ const fs = require("fs");
 const os = require("os");
 const xlsx = require("xlsx");
 const { parse } = require("csv-parse");
-const sql = require("mssql");
-const { poolPromise } = require("./db");
+const { sql } = require("./db");
 
 // Setup multer
 const uploadDir = path.join(os.tmpdir(), "uploads");

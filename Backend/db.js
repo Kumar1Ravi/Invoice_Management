@@ -1,9 +1,3 @@
-if (process.env.POSTGRES_URL) {
-    // Use Vercel Postgres
-    const { sql } = require('@vercel/postgres');
-    module.exports = { sql };
-} else {
-    // Use local MSSQL
 const sql = require('mssql');
 
 let poolPromise = null;
@@ -29,8 +23,7 @@ if (process.env.DB_USER || process.env.DB_PASSWORD || process.env.DB_SERVER) {
             console.error('❌ SQL Server Connection Error: ', err);
         });
 } else {
-    console.log('ℹ️ No DB config, using mock data');
+    console.log('ℹ️ No DB config found');
 }
 
 module.exports = { sql, poolPromise };
-}

@@ -18,32 +18,17 @@ router.post("/login", async (req, res) => {
         }
 
         // Query database
-        let user;
-        if (poolPromise) {
-            // MSSQL
-            const pool = await poolPromise;
-            const result = await pool.request()
-                .input("Emp_Code", sql.VarChar, empcode)
-                .query("SELECT Emp_Code, Emp_Name, Password FROM Login_User WHERE Emp_Code = @Emp_Code");
-            if (result.recordset.length === 0) {
-                return res.json({ success: false, message: "Employee Code not found" });
-            }
-            user = result.recordset[0];
-            user.emp_code = user.Emp_Code;
-            user.emp_name = user.Emp_Name;
-            user.password = user.Password;
-        } else {
-            // Postgres - temporarily disabled for deployment
-            // const result = await sql`SELECT emp_code, emp_name, password FROM login_user WHERE emp_code = ${empcode}`;
-            // if (result.rows.length === 0) {
-            //     return res.json({ success: false, message: "Employee Code not found" });
-            // }
-            // user = result.rows[0];
-            // Mock user for testing - accept any password
-            user = { emp_code: empcode, emp_name: empcode };
-            // Skip password check for mock
-            // const match = true;
+        const pool = await poolPromise;
+        const result = await pool.request()
+            .input("Emp_Code", sql.VarChar, empcode)
+            .query("SELECT Emp_Code, Emp_Name, Password FROM Login_User WHERE Emp_Code = @Emp_Code");
+        if (result.recordset.length === 0) {
+            return res.json({ success: false, message: "Employee Code not found" });
         }
+        const user = result.recordset[0];
+        user.emp_code = user.Emp_Code;
+        user.emp_name = user.Emp_Name;
+        user.password = user.Password;
 
         // Fix PHP bcrypt hash ($2y$ → $2b$)
         let hash = user.password;

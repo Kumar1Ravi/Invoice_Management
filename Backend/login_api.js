@@ -17,6 +17,13 @@ router.post("/login", async (req, res) => {
             return res.json({ success: false, message: "Missing credentials" });
         }
 
+        // Check if DB is configured
+        if (!poolPromise) {
+            // Mock login - accept any password
+            res.json({ success: true, empname: empcode });
+            return;
+        }
+
         // Query database
         const pool = await poolPromise;
         const result = await pool.request()
@@ -48,9 +55,9 @@ router.post("/login", async (req, res) => {
         // Save session (ensure express-session is set up in server.js)
         if (!req.session) req.session = {};
         req.session.empcode = user.emp_code;
-        req.session.empname = user.emp_name;
+        req.session.empname = user.emp_code;
 
-        res.json({ success: true, empname: user.emp_name });
+        res.json({ success: true, empname: user.emp_code });
 
     } catch (err) {
         console.error("Login API error:", err); // 🔹 detailed error logging
